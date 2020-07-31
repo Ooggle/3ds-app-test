@@ -1,3 +1,4 @@
+
 // Simple citro2d untextured shape example
 #include <citro2d.h>
 
@@ -25,6 +26,7 @@ struct GuiButton{
 	int rectH;
 	int selected;
 	int clicked;
+	int go;
 	char* text[255];
 };
 
@@ -81,8 +83,16 @@ void drawButton(struct GuiButton button) {
 	C2D_DrawText(&myText, C2D_WithColor | C2D_AlignCenter, button.rectX + (button.rectW / 2), button.rectY + (button.rectH / 2) - (outHeight / 2), 1, 0.8, 0.8, clrWhite);
 }
 
-void clearSelectedButtons(struct GuiButton screenButtons, int count) {
+void clearSelectedButtons(struct GuiButton *screenButtons, int count) {
+	for(int y = 0; y < count; y++) {
+		screenButtons[y].selected = BTN_NOT_SELECTED;
+	}
+}
 
+void clearClickedButtons(struct GuiButton *screenButtons, int count) {
+	for(int y = 0; y < count; y++) {
+		screenButtons[y].clicked = BTN_NOT_CLICKED;
+	}
 }
 
 void drawButtons(struct GuiButton *screenButtons, int count) {
@@ -100,19 +110,14 @@ void drawButtons(struct GuiButton *screenButtons, int count) {
 
 				printf("\x1b[1;1HTouch button: %d    ", i + 1);
 
-				// clearSelectedButtons(screenButtons, 3);
-				for(int y = 0; y < count; y++) {
-					screenButtons[y].selected = BTN_NOT_SELECTED;
-					screenButtons[y].clicked = BTN_NOT_CLICKED;
-				}
+				clearSelectedButtons(screenButtons, count);
+				clearClickedButtons(screenButtons, count);
 
 				screenButtons[i].selected = BTN_SELECTED;
 				screenButtons[i].clicked = BTN_CLICKED;
 				
 			} else {
-				for(int y = 0; y < count; y++) {
-					screenButtons[y].clicked = BTN_NOT_CLICKED;
-				}
+				clearClickedButtons(screenButtons, count);
 			}
 
 			printf("\x1b[3;1HTouch X: %d  ", screenPos.px);
@@ -121,18 +126,8 @@ void drawButtons(struct GuiButton *screenButtons, int count) {
 		} else {
 			printf("\x1b[1;1HTouch button: none");
 			printf("\x1b[5;1HScreen touch: no ");
-			for(int y = 0; y < count; y++) {
-				screenButtons[y].clicked = BTN_NOT_CLICKED;
-			}
+			clearClickedButtons(screenButtons, count);
 		}
-
-		/* if(kDown & KEY_A) {
-			drawButton(screenButtons[i], BTN_SELECTED, BTN_CLICKED);
-			//drawButton((BOTTOM_SCREEN_WIDTH /2) - 70, (BOTTOM_SCREEN_HEIGHT /2) - 15, 140, 30, BTN_CLICKED);
-		} else {
-			drawButton(screenButtons[i], BTN_NOT_SELECTED, BTN_NOT_CLICKED);
-			//drawButton((BOTTOM_SCREEN_WIDTH /2) - 70, (BOTTOM_SCREEN_HEIGHT /2) - 15, 140, 30, BTN_NOT_CLICKED);
-		} */
 
 		drawButton(screenButtons[i]);
 	}
@@ -170,9 +165,9 @@ int main(int argc, char* argv[]) {
 	char text3[] = "3rd menu";
 
 	struct GuiButton screenButtons[3] = {
-		{(BOTTOM_SCREEN_WIDTH /2) - 70, (BOTTOM_SCREEN_HEIGHT /2) - 60, 140, 30, 1, 0, {text1}},
-		{(BOTTOM_SCREEN_WIDTH /2) - 70, (BOTTOM_SCREEN_HEIGHT /2) - 15, 140, 30, 0, 0, {text2}},
-		{(BOTTOM_SCREEN_WIDTH /2) - 70, (BOTTOM_SCREEN_HEIGHT /2) + 30, 140, 30, 0, 0, {text3}}
+		{(BOTTOM_SCREEN_WIDTH /2) - 70, (BOTTOM_SCREEN_HEIGHT /2) - 60, 140, 30, 1, 0, 0, {text1}},
+		{(BOTTOM_SCREEN_WIDTH /2) - 70, (BOTTOM_SCREEN_HEIGHT /2) - 15, 140, 30, 0, 0, 0, {text2}},
+		{(BOTTOM_SCREEN_WIDTH /2) - 70, (BOTTOM_SCREEN_HEIGHT /2) + 30, 140, 30, 0, 0, 0, {text3}}
 	};
 
 	// Main loop
@@ -195,6 +190,23 @@ int main(int argc, char* argv[]) {
 		C2D_SceneBegin(bottom);
 
 		drawButtons(screenButtons, 3);
+
+		// some additional GUI
+		C2D_DrawRectSolid(0, 0, 0, BOTTOM_SCREEN_WIDTH, 20, blurple);
+		C2D_DrawRectSolid(0, BOTTOM_SCREEN_HEIGHT - 20, 0, BOTTOM_SCREEN_WIDTH, BOTTOM_SCREEN_HEIGHT - 20, blurple);
+
+		// display text
+		C2D_TextBuf myTextBuf = C2D_TextBufNew(15);
+		C2D_Text myText;
+
+		C2D_TextParse(&myText, myTextBuf, "start - exit");
+		
+		C2D_TextOptimize(&myText);
+
+		float outWidth = 0;
+		float outHeight = 0;
+		C2D_TextGetDimensions(&myText, 0.8, 0.8, &outWidth, &outHeight);
+		C2D_DrawText(&myText, C2D_AlignCenter, BOTTOM_SCREEN_WIDTH / 2, BOTTOM_SCREEN_HEIGHT - 20, 1, 0.6, 0.6);
 
 		C3D_FrameEnd(0);
 	}
