@@ -16,3 +16,6 @@ make
 # upload the app using 3dslink
 $DEVKITPRO/tools/bin/3dslink -a {IP} 3ds-app-test.3dsx
 ```
+
+Screenshot from lasted build:   
+![screen](screen.png)
