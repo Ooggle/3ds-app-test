@@ -17,5 +17,5 @@ make
 $DEVKITPRO/tools/bin/3dslink -a {IP} 3ds-app-test.3dsx
 ```
 
-Screenshot from lasted build:   
+Screenshot from lastest build:   
 ![screen](screen.png)
